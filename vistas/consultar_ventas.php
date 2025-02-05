@@ -190,7 +190,7 @@ if (isset($_SESSION['usuario'])) {
                                             <td><?php echo $fila[0] ?></td>
                                             <td><?php echo $fila[2] ?></td>
                                             <td><?php echo $fila[6] ?></td>
-                                            <td><?php echo $fila[1] ?></td>
+                                            <td><?php echo date('d/m/Y', strtotime($fila[1])); ?></td>
                                             <td><?php echo  number_format($fila[4], 0, ',', '.'); ?></td>
                                             <td><?php echo $fila[5] ?></td>
                                             <td>

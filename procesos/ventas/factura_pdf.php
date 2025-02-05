@@ -45,7 +45,7 @@ if (isset($_SESSION['usuario'])) {
 
             // Captura los valores en variables
             $id_venta = $fila["id_venta"];
-            $fecha = $fila["fecha"];
+            $fecha = date('d/m/Y', strtotime($fila["fecha"]));
             $cliente = $fila["nombre"];
             $id_cliente = $fila["id_cliente"];
             $direccion = $fila["direccion"];
