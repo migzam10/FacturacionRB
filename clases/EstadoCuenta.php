@@ -16,6 +16,32 @@ class EstadoCuenta
         return mysqli_query($conexion, $sql);
     }
 
+    public function consultarCreditosPendienteGeneral()
+    {
+        $c = new Conexion();
+        $conexion = $c->conectar();
+        $sql = "SELECT v.id_venta, v.cliente, v.fecha, v.total, v.credito_pendiente, 
+                       (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') as total_pagado
+                FROM ventas v 
+                WHERE v.tipo = 'credito' 
+                AND v.estado = 'A'
+                AND ((SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') < v.total)
+                ORDER BY v.fecha DESC";
+        return mysqli_query($conexion, $sql);
+    }
+
+    public function consultarCreditosTotal()
+    {
+        $c = new Conexion();
+        $conexion = $c->conectar();
+        $sql = "SELECT SUM(v.total - COALESCE((SELECT SUM(monto) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A'), 0)) AS saldo_pendiente
+                    FROM ventas v
+                    WHERE v.tipo = 'credito' 
+                    AND v.estado = 'A'
+                    AND ((SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') < v.total);";
+        return mysqli_query($conexion, $sql);
+    }
+
     public function registrarPago($id_venta, $monto, $tipo_pago)
     {
         $c = new Conexion();
