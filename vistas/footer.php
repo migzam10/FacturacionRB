@@ -16,7 +16,7 @@ if(isset($_SESSION['usuario']))
 ?>
     <footer class="footer">
 		<span class="text-right">
-		Copyright <a target="_blank" style="color:black">MigZam</a>
+		Copyright <a target="_blank" href="http://migzam.com/" style="color:black">MigZam</a>
 		</span>
         
 	</footer>

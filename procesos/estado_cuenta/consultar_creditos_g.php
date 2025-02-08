@@ -14,10 +14,14 @@ if (mysqli_num_rows($resultado) > 0) {
         $cliente = $row['nombre'];
         $direccion = $row['direccion'] ?? "No disponible"; // Si no tiene dirección, mostrar "No disponible"
         $saldo_pendiente = $row['total'] - $row['total_pagado'];
+        $telefono = $row['telefono'];
+        $idcliente = $row['id_cliente'];
 
         if (!isset($clientes[$cliente])) {
             $clientes[$cliente] = [
                 'direccion' => $direccion,
+                'idcliente' => $idcliente,
+                'telefono' => $telefono,
                 'ventas' => [],
                 'total_saldo' => 0
             ];
@@ -33,18 +37,29 @@ if (mysqli_num_rows($resultado) > 0) {
 
         $clientes[$cliente]['total_saldo'] += $saldo_pendiente;
     }
-    ?>
+?>
 
     <div class="card mt-3">
         <div class="card-body">
-            
+
 
             <?php foreach ($clientes as $cliente => $data) { ?>
                 <div class="mb-4">
-                    <hr>
-                    <strong>Nombre:</strong> <?php echo strtoupper($cliente); ?><br>
-                    <strong>Dir:</strong> <?php echo $data['direccion']; ?>
-                    <hr>
+
+                    <div class="row">
+                        <div class="col-6"><strong>Nombre:</strong> <?php echo strtoupper($cliente); ?></div>
+                        <div class="col-6"> <strong>Dirección:</strong> <?php echo $data['direccion']; ?></div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6"><strong>CC/NIT:</strong> <?php echo $data['idcliente']; ?></div>
+                        <div class="col-6"><strong>Telefono:</strong> <?php echo $data['telefono']; ?></div>
+                    </div>
+
+
+
+
                     <div class="table-responsive">
                         <table class="table table-striped" id="dtcreditos">
                             <thead>
@@ -69,17 +84,18 @@ if (mysqli_num_rows($resultado) > 0) {
                             </tbody>
                         </table>
                     </div>
-                    <hr>
+
                     <div class="text-end">
-                        <strong>TOTAL: <?php echo number_format($data['total_saldo'], 2, ',', '.'); ?></strong>
+                        <strong>TOTAL: $   <?php echo number_format($data['total_saldo'], 2, ',', '.'); ?></strong>
                     </div>
+                    <hr>
                     <hr>
                 </div>
             <?php } ?>
         </div>
     </div>
 
-    <?php
+<?php
 } else {
     echo '<div class="alert alert-info mt-3">No hay créditos pendientes.</div>';
 }
