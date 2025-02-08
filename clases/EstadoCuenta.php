@@ -20,12 +20,23 @@ class EstadoCuenta
     {
         $c = new Conexion();
         $conexion = $c->conectar();
-        $sql = "SELECT v.id_venta, v.cliente, v.fecha, v.total, v.credito_pendiente, 
-                       (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') as total_pagado
-                FROM ventas v 
+        $sql = "SELECT 
+                    v.id_venta, 
+                    c.id_cliente, 
+                    c.nombre,
+                    c.telefono,
+                    c.direccion,
+                    v.fecha, 
+                    v.total, 
+                    v.credito_pendiente, 
+                    (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') AS total_pagado
+                FROM ventas v
+                JOIN cliente c ON v.id_cliente = c.id_cliente  
                 WHERE v.tipo = 'credito' 
                 AND v.estado = 'A'
-                AND ((SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') < v.total)
+                AND (
+                    (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') < v.total
+                )
                 ORDER BY v.fecha DESC";
         return mysqli_query($conexion, $sql);
     }
