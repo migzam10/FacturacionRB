@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1deb1
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: localhost:3306
--- Tiempo de generación: 17-03-2024 a las 23:30:04
--- Versión del servidor: 10.11.6-MariaDB-0+deb12u1
--- Versión de PHP: 8.2.7
+-- Servidor: localhost
+-- Tiempo de generación: 30-01-2025 a las 06:51:49
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -21,19 +21,6 @@ SET time_zone = "+00:00";
 -- Base de datos: `bd_venta`
 --
 
-DELIMITER $$
---
--- Procedimientos
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `baja_stock` (IN `stockt` INT, IN `cod_producto` INT)   BEGIN
-DECLARE stocka int;
-set stocka = (select stock from productos where id_producto=cod_producto);
-set stockt = (stocka - stockt);
-update productos set stock = stockt where id_producto=cod_producto;
-END$$
-
-DELIMITER ;
-
 -- --------------------------------------------------------
 
 --
@@ -44,7 +31,7 @@ CREATE TABLE `categorias` (
   `id_categoria` int(11) NOT NULL,
   `nombre` varchar(100) CHARACTER SET utf32 COLLATE utf32_general_ci DEFAULT NULL,
   `estado` varchar(10) CHARACTER SET utf32 COLLATE utf32_general_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -57,7 +44,8 @@ CREATE TABLE `cliente` (
   `nombre` varchar(50) NOT NULL,
   `telefono` varchar(10) NOT NULL,
   `direccion` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL
+  `email` varchar(100) NOT NULL,
+  `ciudad` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -68,11 +56,27 @@ CREATE TABLE `cliente` (
 
 CREATE TABLE `detalle_ventas` (
   `id_ventas` int(11) DEFAULT NULL,
-  `id_productos` int(11) DEFAULT NULL,
-  `cantidad` int(11) DEFAULT NULL,
+  `id_productos` varchar(100) DEFAULT NULL,
+  `cantidad` decimal(9,3) DEFAULT NULL,
   `precio` decimal(9,2) DEFAULT NULL,
-  `importe` decimal(9,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+  `importe` decimal(9,2) DEFAULT NULL,
+  `id_categoria` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pagos`
+--
+
+CREATE TABLE `pagos` (
+  `id_pago` int(11) NOT NULL,
+  `id_venta` int(11) DEFAULT NULL,
+  `fecha` datetime DEFAULT NULL,
+  `monto` decimal(10,2) DEFAULT NULL,
+  `tipo_pago` enum('total','abono') DEFAULT NULL,
+  `estado` char(1) DEFAULT 'A'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -89,7 +93,7 @@ CREATE TABLE `productos` (
   `id_proveedor` int(11) DEFAULT NULL,
   `estado` varchar(10) DEFAULT NULL,
   `id_categoria` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -104,7 +108,7 @@ CREATE TABLE `proveedores` (
   `telefono` varchar(9) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
   `estado` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -118,14 +122,7 @@ CREATE TABLE `usuarios` (
   `clave` varchar(50) DEFAULT NULL,
   `tipo` varchar(20) DEFAULT NULL,
   `estado` varchar(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
-
---
--- Volcado de datos para la tabla `usuarios`
---
-
-INSERT INTO `usuarios` (`id_usuario`, `usuario`, `clave`, `tipo`, `estado`) VALUES
-(1, 'admin', '90b9aa7e25f80cf4f64e990b78a9fc5ebd6cecad', 'admin', '1');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 -- --------------------------------------------------------
 
@@ -140,8 +137,10 @@ CREATE TABLE `ventas` (
   `estado` varchar(20) DEFAULT NULL,
   `total` decimal(10,2) DEFAULT NULL,
   `tipo` varchar(50) DEFAULT NULL,
-  `id_cliente` varchar(15) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+  `id_cliente` varchar(15) DEFAULT NULL,
+  `credito_pendiente` decimal(10,2) DEFAULT 0.00,
+  `estado_credito` enum('pendiente','pagado') DEFAULT 'pendiente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Índices para tablas volcadas
@@ -158,6 +157,13 @@ ALTER TABLE `categorias`
 --
 ALTER TABLE `cliente`
   ADD PRIMARY KEY (`id_cliente`);
+
+--
+-- Indices de la tabla `pagos`
+--
+ALTER TABLE `pagos`
+  ADD PRIMARY KEY (`id_pago`),
+  ADD KEY `id_venta` (`id_venta`);
 
 --
 -- Indices de la tabla `productos`
@@ -196,10 +202,16 @@ ALTER TABLE `categorias`
   MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `pagos`
+--
+ALTER TABLE `pagos`
+  MODIFY `id_pago` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedores`
@@ -211,17 +223,17 @@ ALTER TABLE `proveedores`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT de la tabla `ventas`
---
-ALTER TABLE `ventas`
-  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `pagos`
+--
+ALTER TABLE `pagos`
+  ADD CONSTRAINT `pagos_ibfk_1` FOREIGN KEY (`id_venta`) REFERENCES `ventas` (`id_venta`);
 
 --
 -- Filtros para la tabla `productos`

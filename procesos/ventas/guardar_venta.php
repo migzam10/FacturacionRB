@@ -10,7 +10,6 @@ $nombre_cliente = mysqli_real_escape_string($ccn,$_POST['txtcliente']);
 $tipo = $_POST['txttipo'];
 $id_cliente = $_POST['txtnumero'];
 $id_consecutivo = $_POST['txtconsecutivo'];
-$fecha = $_POST['txtfecha'];
 
 //var_dump($_SESSION['tablacomprastemp']);
 
@@ -40,7 +39,7 @@ else {
         //echo $datoscontrato;
         try{
 
-            $obj->save($nombre_cliente,$total,$tipo,$id_cliente, $estado_credito, $id_consecutivo, $fecha);
+            $obj->save($nombre_cliente,$total,$tipo,$id_cliente, $estado_credito, $id_consecutivo);
             $obj->save_detalle($id_consecutivo);
             echo "ok";
             unset($_SESSION['tablacomprastemp']);

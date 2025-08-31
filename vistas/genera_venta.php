@@ -99,15 +99,12 @@ if (isset($_SESSION['usuario'])) {
                             <!-- Button trigger modal -->
                             <div class="card col-12">
                                 <div class="card-body">
-                                    <div class="col-lg-12" style="padding-bottom:10px;">
-                                        <?php date_default_timezone_set("America/Bogota");
-                                        $fecha = date("Y-m-d"); ?>
-                                        <div class="row justify-content-center align-items-center">
-                                            <label class="col-lg-4 font-weight-bold labelCenter">Fecha :</label>
-
-                                            <input type="date" class="form-control form-control-sm col-lg-8" id="txtfecha" name="txtfecha" value="<?= $fecha ?>">
-                                        </div>
-                                    </div>
+                                    <!--div class="col-lg-12">
+                                    <label>Fecha</label>
+                                    <?php date_default_timezone_set("America/Bogota");
+                                    $fecha = date("Y-m-d"); ?>
+                                    <input type="date" class="form-control" value="<?= $fecha ?>">
+                                </div-->
                                     <div class="col-lg-12" style="padding-bottom:10px;">
                                         <div class="row justify-content-center align-items-center">
                                             <label class="col-lg-4 font-weight-bold labelCenter">Orden : </label>
@@ -127,7 +124,6 @@ if (isset($_SESSION['usuario'])) {
                                         <div class="row justify-content-center align-items-center">
                                             <label class="col-lg-4 font-weight-bold labelCenter">Cliente :</label>
                                             <select id="txtcliente" name="txtcliente" class="form-control col-lg-8 form-control-sm">
-                                                <option value="" disabled selected>Seleccione un cliente</option>
                                                 <?php
                                                 require_once '../clases/Cliente.php';
                                                 require_once '../clases/Conexion.php';
@@ -149,7 +145,7 @@ if (isset($_SESSION['usuario'])) {
                                         <div class="row justify-content-center align-items-center">
                                             <label class="col-lg-4 font-weight-bold labelCenter">CC / NIT :</label>
                                             <!-- Coloca el valor de $pro[0] aquí -->
-                                            <input id="txtnumero" name="txtnumero" class="form-control col-lg-8 form-control-sm" value="" />
+                                            <input id="txtnumero" name="txtnumero" class="form-control col-lg-8 form-control-sm" value="1" />
                                         </div>
                                     </div>
                                     <div class="col-lg-12">
@@ -283,15 +279,13 @@ if (isset($_SESSION['usuario'])) {
                 total = $('#txttotal').html();
                 tipo = $("input[name='forma_pago']:checked").val();
                 id_cliente = $('#txtnumero').val();
-                fecha =  $('#txtfecha').val();
                 if (nom.length != 0) {
                     datos = {
                         "txtconsecutivo": conse,
                         "txttotal": total,
                         "txtcliente": nom,
                         "txttipo": tipo,
-                        "txtnumero": id_cliente,
-                        "txtfecha": fecha
+                        "txtnumero": id_cliente
                     };
                     $.ajax({
                         url: '../procesos/ventas/guardar_venta.php',

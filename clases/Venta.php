@@ -2,12 +2,12 @@
 date_default_timezone_set("America/Bogota");
 class Venta
 {
-    public function save($clientee, $total, $tipo, $id_cliente, $estado_credito, $id_consecutivo, $fecha)
+    public function save($clientee, $total, $tipo, $id_cliente, $estado_credito, $id_consecutivo)
     {
         $c = new Conexion();
         $conexion = $c->conectar();
         $cliente = $c->test_input($clientee);
-        
+        $fecha = date('y-m-d H:i:s');
         $sql = "INSERT INTO ventas(cliente,fecha,estado,total,tipo,id_cliente, estado_credito, id_venta) 
                 values('$cliente','$fecha','A','$total','$tipo','$id_cliente', '$estado_credito', '$id_consecutivo')";
         $result = mysqli_query($conexion, $sql);
@@ -103,7 +103,7 @@ class Venta
         $datos = array(
             "id_venta" => html_entity_decode($ver[0]),
             "cliente" => html_entity_decode($ver[1]),
-            "fecha" => html_entity_decode(date('d/m/Y', strtotime($ver[2]))),
+            "fecha" => html_entity_decode($ver[2]),
             "total" => html_entity_decode(number_format($ver[3], 0, ',', '.')),
             "tipo" => html_entity_decode($ver[4]),
             "numero" => html_entity_decode($ver[5])
