@@ -142,7 +142,13 @@ if (isset($_SESSION['usuario'])) {
 
                             </li-->
                             <li class="submenu">
-                                <a href="estado_cuenta.php"><i class="fa fa-check"></i> <span> Estado cuenta </span> <span class="users"></span></a>
+
+                                <a href="#"><i class="fa fa-check"></i> <span> Estado cuenta </span> <span class="menu-arrow"></span></a>
+                                <ul class="list-unstyled">
+                                    <li><a href="estado_cuenta.php">Por clientes</a></li>
+                                    <li><a href="estado_cuenta_general.php">General</a></li>
+                                    <li><a href="comprobante_ingreso.php">Comprobante Ing</a></li>
+                                </ul>
 
                             </li>
 

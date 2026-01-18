@@ -190,7 +190,7 @@ if (isset($_SESSION['usuario'])) {
                                             <td><?php echo $fila[0] ?></td>
                                             <td><?php echo $fila[2] ?></td>
                                             <td><?php echo $fila[6] ?></td>
-                                            <td><?php echo $fila[1] ?></td>
+                                            <td><?php echo date('d/m/Y', strtotime($fila[1])); ?></td>
                                             <td><?php echo  number_format($fila[4], 0, ',', '.'); ?></td>
                                             <td><?php echo $fila[5] ?></td>
                                             <td>
@@ -403,12 +403,17 @@ if (isset($_SESSION['usuario'])) {
             ['ID', 'Cliente', 'Identificación', 'Fecha', 'Total']
         ];
         data.forEach(function(row) {
+
+            var totalLimpio = row[4].toString()
+            .replace(/\./g, '')   // Quita puntos de miles
+            .replace(',', '.')    // Cambia coma decimal por punto
+            .replace(/[^\d.-]/g, '');
             xlsxData.push([
                 row[0], // ID
                 row[1], // Cliente
                 row[2], // Identificación
                 row[3], // Fecha
-                row[4] // Total
+                parseFloat(totalLimpio) // Total
             ]);
         });
 
@@ -418,7 +423,7 @@ if (isset($_SESSION['usuario'])) {
         XLSX.utils.book_append_sheet(wb, ws, "Ventas");
 
         // Descarga el archivo XLSX
-        XLSX.writeFile(wb, 'ventas.xlsx');
+        XLSX.writeFile(wb, 'Ventas.xlsx');
     });
 
     $('#exportarPDF').click(function() {

@@ -3,7 +3,7 @@ class Conexion{
     
     public function conectar()
     {
-        $ccn = mysqli_connect("localhost","root","","bd_venta");
+        $ccn = mysqli_connect("localhost","root","migzam10","bd_venta");
         return $ccn;
     }
     public function test_input($data) {

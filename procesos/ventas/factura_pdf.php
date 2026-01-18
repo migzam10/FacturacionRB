@@ -1,5 +1,6 @@
 <?php
 session_start();
+ob_start(); 
 if (isset($_SESSION['usuario'])) {
 
     //require_once '../clases/Venta.php';
@@ -44,7 +45,7 @@ if (isset($_SESSION['usuario'])) {
 
             // Captura los valores en variables
             $id_venta = $fila["id_venta"];
-            $fecha = $fila["fecha"];
+            $fecha = date('d/m/Y', strtotime($fila["fecha"]));
             $cliente = $fila["nombre"];
             $id_cliente = $fila["id_cliente"];
             $direccion = $fila["direccion"];
@@ -56,73 +57,83 @@ if (isset($_SESSION['usuario'])) {
             // Aquí puedes usar las variables como desees
             //echo "ID Venta: $id_venta, Fecha: $fecha, Cliente: $cliente, Número: $numero, Total: $total";
 
-
-            $pdf->SetFont('Arial', 'B', 10);
-            $pdf->setY(4);
-            $pdf->setX(10);
-            $pdf->Cell(5, $textypos, "ORDEN NO. $id_venta");
+            
+            $textypos=10;
 
             $pdf->SetFont('Arial', 'B', 10);
             $pdf->setY(10);
+            $pdf->setX(10);
+            $pdf->Cell(5, $textypos, "ALMACEN");
+
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->setY(10);
+            $pdf->setX(150);
+            $pdf->Cell(5, $textypos, "ORDEN NO. $id_venta");
+
+            $pdf->Line($pdf->GetX()+45, $pdf->GetY()+8, 10, $pdf->GetY()+8);
+
+
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->setY(20);
             $pdf->setX(10);
             $pdf->Cell(5, $textypos, "CLIENTE");
             $pdf->SetFont('Arial', '', 10);
-            $pdf->setY(10);
+            $pdf->setY(20);
             $pdf->setX(33);
             $pdf->Cell(5, $textypos, ":  ".$cliente);
 
             $pdf->SetFont('Arial', 'B', 10);
-            $pdf->setY(15);
+            $pdf->setY(25);
             $pdf->setX(10);
             $pdf->Cell(5, $textypos, "NIT/C.C");
             $pdf->SetFont('Arial', '', 10);
-            $pdf->setY(15);
+            $pdf->setY(25);
             $pdf->setX(33);
             $pdf->Cell(5, $textypos, ":  ".$id_cliente);
 
             $pdf->SetFont('Arial', 'B', 10);
-            $pdf->setY(20);
+            $pdf->setY(30);
             $pdf->setX(10);
             $pdf->Cell(5, $textypos, "TELEFONO");
             $pdf->SetFont('Arial', '', 10);
-            $pdf->setY(20);
+            $pdf->setY(30);
             $pdf->setX(33);
             $pdf->Cell(5, $textypos, ":  ".$telefono);
 
             $pdf->SetFont('Arial', 'B', 10);
-            $pdf->setY(10);
+            $pdf->setY(20);
             $pdf->setX(80);
             $pdf->Cell(5, $textypos, "DIRECCION");
             $pdf->SetFont('Arial', '', 10);
-            $pdf->setY(10);
+            $pdf->setY(20);
             $pdf->setX(105);
             $pdf->Cell(5, $textypos, ":  ".$direccion);
 
             $pdf->SetFont('Arial', 'B', 10);
-            $pdf->setY(15);
+            $pdf->setY(25);
             $pdf->setX(80);
             $pdf->Cell(5, $textypos, "CIUDAD");
             $pdf->SetFont('Arial', '', 10);
-            $pdf->setY(15);
+            $pdf->setY(25);
             $pdf->setX(105);
             $pdf->Cell(5, $textypos, ":  ".$ciudad);
             
             $pdf->SetFont('Arial', 'B', 10);
-            $pdf->setY(20);
+            $pdf->setY(30);
             $pdf->setX(80);
             $pdf->Cell(5, $textypos, "CORREO");
             $pdf->SetFont('Arial', '', 10);
-            $pdf->setY(20);
+            $pdf->setY(30);
             $pdf->setX(105);
             $pdf->Cell(5, $textypos, ":  ".$email);
 
             
             
             $pdf->SetFont('Arial', 'B', 10);
-            $pdf->setY(10);
+            $pdf->setY(20);
             $pdf->setX(150);
             $pdf->Cell(5, $textypos, "Fecha: $fecha");
-            $pdf->setY(15);
+            $pdf->setY(25);
             $pdf->setX(150);
             $pdf->Cell(5, $textypos, "Forma de Pago: $f_pago");
             $pdf->setY(20);
@@ -132,7 +143,7 @@ if (isset($_SESSION['usuario'])) {
             echo "No se encontraron resultados.";
         }
         /// Apartir de aqui empezamos con la tabla de productos
-        $pdf->setY(25);
+        $pdf->setY(30);
         $pdf->setX(135);
         $pdf->Ln();
 
@@ -150,7 +161,7 @@ if (isset($_SESSION['usuario'])) {
         $pdf->SetFont('Arial', '', 10);
 
         // Column widths
-        $w = array(20, 95, 35, 40);
+        $w = array(85, 30, 35, 40);
         // Header
         $pdf->SetFont('Arial', 'B', 10);
         for ($i = 0; $i < count($header); $i++)
@@ -204,7 +215,7 @@ if (isset($_SESSION['usuario'])) {
         }
         
 
-
+        ob_end_clean();
         $pdf->output();
     } else {
         // Manejar el caso en que no se proporciona un ID de venta válido

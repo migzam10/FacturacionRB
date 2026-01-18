@@ -18,9 +18,9 @@ if (mysqli_num_rows($resultado) > 0) {
             'ID Venta' => $row['id_venta'],
             'Cliente' => $row['nombre'],
             'Fecha' => date('d/m/Y', strtotime($row['fecha'])),
-            'Total Venta' => number_format($row['total'], 2, ',', ''),
-            'Total Pagado' => number_format($row['total_pagado'], 2, ',', ''),
-            'Saldo Pendiente' => number_format($saldo_pendiente, 2, ',', '')
+            'Total Venta' => (float)$row['total'],
+            'Total Pagado' => (float)$row['total_pagado'],
+            'Saldo Pendiente' => (float)$saldo_pendiente
         ];
     }
 }

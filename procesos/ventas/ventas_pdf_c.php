@@ -69,7 +69,7 @@ if (isset($_SESSION['usuario'])) {
         $pdf->Ln(10);
 
         $pdf->setX(185);
-        $pdf->Cell(5, $textypos, "TOTAL :  ". number_format($total['total_importe'], 3, ',', '.'), 0, 1, 'R');
+        $pdf->Cell(5, 1, "TOTAL :  ". number_format($total['total_importe'], 3, ',', '.'), 0, 1, 'R');
 
         $pdf->Output();
     } else

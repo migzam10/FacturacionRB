@@ -16,6 +16,68 @@ class EstadoCuenta
         return mysqli_query($conexion, $sql);
     }
 
+    public function consultarCreditosPendienteGeneral()
+    {
+        $c = new Conexion();
+        $conexion = $c->conectar();
+        $sql = "SELECT 
+                    v.id_venta, 
+                    c.id_cliente, 
+                    c.nombre,
+                    c.telefono,
+                    c.direccion,
+                    v.fecha, 
+                    v.total, 
+                    v.credito_pendiente, 
+                    (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') AS total_pagado
+                FROM ventas v
+                JOIN cliente c ON v.id_cliente = c.id_cliente  
+                WHERE v.tipo = 'credito' 
+                AND v.estado = 'A'
+                AND (
+                    (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') < v.total
+                )
+                ORDER BY v.fecha DESC";
+        return mysqli_query($conexion, $sql);
+    }
+
+    public function consultarComprobantesIngresos()
+    {
+        $c = new Conexion();
+        $conexion = $c->conectar();
+        $sql = "SELECT 
+                v.id_venta, 
+                c.id_cliente, 
+                c.nombre,
+                c.telefono,
+                c.direccion,
+                v.fecha, 
+                v.total, 
+                v.tipo, 
+                CASE 
+                    WHEN v.tipo IN ('Efectivo', 'Transferencia') THEN v.total 
+                    ELSE (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') 
+                END AS total_pagado
+
+            FROM ventas v
+            JOIN cliente c ON v.id_cliente = c.id_cliente  
+            WHERE v.estado = 'A'
+            ORDER BY v.id_venta DESC";
+        return mysqli_query($conexion, $sql);
+    }
+
+    public function consultarCreditosTotal()
+    {
+        $c = new Conexion();
+        $conexion = $c->conectar();
+        $sql = "SELECT SUM(v.total - COALESCE((SELECT SUM(monto) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A'), 0)) AS saldo_pendiente
+                    FROM ventas v
+                    WHERE v.tipo = 'credito' 
+                    AND v.estado = 'A'
+                    AND ((SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_venta = v.id_venta AND estado = 'A') < v.total);";
+        return mysqli_query($conexion, $sql);
+    }
+
     public function registrarPago($id_venta, $monto, $tipo_pago)
     {
         $c = new Conexion();
@@ -68,6 +130,17 @@ class EstadoCuenta
         }
     }
 
+    public function registrarPagoTotal($id_venta, $monto, $tipo_pago)
+    {
+        $c = new Conexion();
+        $conexion = $c->conectar();
+        $fecha = date('Y-m-d H:i:s');
+        $sql = "INSERT INTO pagos (id_venta, fecha, monto, tipo_pago) 
+                VALUES ('$id_venta', '$fecha', '$monto', '$tipo_pago')";
+        return mysqli_query($conexion, $sql);
+    }
+
+
     public function obtenerHistorialPagos($id_venta)
     {
         $c = new Conexion();
@@ -105,4 +178,28 @@ class EstadoCuenta
         $result = mysqli_query($conexion, $sql);
         return $result;
     }
+
+    public function obtenerDatosVentaCliente($id_venta)
+{
+    $c = new Conexion();
+    $conexion = $c->conectar();
+    
+    // Escapamos el ID por seguridad
+    $id_venta = mysqli_real_escape_string($conexion, $id_venta);
+
+    $sql = "SELECT 
+                v.id_venta, 
+                v.fecha, 
+                v.total, 
+                v.tipo, 
+                c.id_cliente, 
+                c.nombre, 
+                c.telefono, 
+                c.direccion
+            FROM ventas v
+            JOIN cliente c ON v.id_cliente = c.id_cliente
+            WHERE v.id_venta = '$id_venta'";
+
+    return mysqli_query($conexion, $sql);
+}
 }

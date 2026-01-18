@@ -83,7 +83,7 @@ if (isset($_SESSION['usuario'])) {
                     XLSX.utils.book_append_sheet(wb, ws, "Reporte");
 
                     // Descargar el archivo
-                    XLSX.writeFile(wb, 'Reporte.xlsx');
+                    XLSX.writeFile(wb, 'Reporte estado de cuentas.xlsx');
                 },
                 error: function() {
                     alert("Error al obtener los datos.");
